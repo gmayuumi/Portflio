@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mayumi Dev | Landing Pages & Sites</title>
+    
+    <!-- link para favicon externo -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- tailwind css -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- config tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['Fira Code', 'monospace'] },
+                    colors: {
+                        accent: 'var(--accent-color)',
+                        accentGlow: 'var(--accent-glow)',
+                        bgMain: 'var(--bg-color)'
+                    },
+                    animation: {
+                        'spin-slow': 'spin 10s linear infinite',
+                        'aurora': 'aurora 20s linear infinite',
+                        'blink': 'blink 1s step-end infinite'
+                    },
+                    keyframes: {
+                        aurora: {
+                            "0%": { backgroundPosition: "0% 50%" },
+                            "50%": { backgroundPosition: "100% 50%" },
+                            "100%": { backgroundPosition: "0% 50%" }
+                        },
+                        blink: {
+                            "0%, 100%": { opacity: "1" },
+                            "50%": { opacity: "0" }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400&display=swap');
+        
+        :root {
+            --accent-color: #a855f7;
+            --accent-glow: rgba(168, 85, 247, 0.6);
+            --bg-color: #050505;
+        }
+
+        body { background-color: var(--bg-color); color: white; overflow-x: hidden; transition: background-color 0.8s ease; }
+        
+        .stroke-text { -webkit-text-stroke: 1px rgba(255, 255, 255, 0.15); color: transparent; }
+        
+        /* glitch simples */
+        .glitch-wrapper { position: relative; display: inline-block; }
+        .glitch { 
+            position: relative; 
+            color: white; 
+            mix-blend-mode: normal;
+        }
+        .glitch::before, .glitch::after {
+            content: attr(data-text); 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: var(--bg-color);
+        }
+        .glitch::before { 
+            left: 2px; 
+            text-shadow: -2px 0 #ff00c1; 
+            clip-path: inset(44% 0 61% 0); 
+            animation: glitch-anim-1 0.4s infinite linear alternate-reverse; 
+        }
+        .glitch::after { 
+            left: -2px; 
+            text-shadow: -2px 0 #00fff9; 
+            clip-path: inset(50% 0 30% 0); 
+            animation: glitch-anim-2 0.4s infinite linear alternate-reverse; 
+        }
+        
+        @keyframes glitch-anim-1 {
+            0% { clip-path: inset(20% 0 80% 0); transform: translate(-2px, 1px); }
+            20% { clip-path: inset(60% 0 10% 0); transform: translate(2px, -1px); }
+            40% { clip-path: inset(40% 0 50% 0); transform: translate(-2px, 2px); }
+            60% { clip-path: inset(80% 0 5% 0); transform: translate(2px, -2px); }
+            80% { clip-path: inset(10% 0 70% 0); transform: translate(-1px, 1px); }
+            100% { clip-path: inset(30% 0 20% 0); transform: translate(1px, -1px); }
+        }
+        @keyframes glitch-anim-2 {
+            0% { clip-path: inset(10% 0 60% 0); transform: translate(2px, -1px); }
+            20% { clip-path: inset(30% 0 20% 0); transform: translate(-2px, 2px); }
+            40% { clip-path: inset(70% 0 10% 0); transform: translate(2px, -2px); }
+            60% { clip-path: inset(20% 0 50% 0); transform: translate(-2px, 1px); }
+            80% { clip-path: inset(50% 0 30% 0); transform: translate(1px, -1px); }
+            100% { clip-path: inset(0% 0 80% 0); transform: translate(-1px, 1px); }
+        }
+
+        /* scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
+
+        /* aurora background */
+        .aurora-bg {
+            background: linear-gradient(-45deg, #000000, #1a0b2e, #0f172a, #000000);
+            background-size: 400% 400%;
+        }
+    </style>
+
+    <!-- importmap -->
+    <script type="importmap">
+    {
+        "imports": {
+            "react": "https://esm.sh/react@18.2.0",
+            "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+            "framer-motion": "https://esm.sh/framer-motion@10.16.4?external=react,react-dom",
+            "lucide-react": "https://esm.sh/lucide-react@0.292.0?external=react,react-dom"
+        }
+    }
+    </script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel" data-type="module">
+        import React, { useRef, useState, useEffect, useLayoutEffect } from 'react';
+        import { createRoot } from 'react-dom/client';
+        import { motion, useScroll, useSpring, useTransform, useMotionValue, useInView, AnimatePresence, useMotionTemplate } from 'framer-motion';
+        import { ArrowRight, Smartphone, ChevronDown, Users, Sparkles, ExternalLink, Palette, Plus, Minus, Monitor, Layout, Rocket, Zap, Search, Layers, CheckCircle, Car, Scale, Truck, Heart, Mouse, HelpCircle } from 'lucide-react';
+
+        // --- efeitos visuais ---
+
+        // 1. efeito plexus hero
+        const PlexusBackground = () => {
+            const canvasRef = useRef(null);
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext('2d');
+                let animationFrameId;
+                let particles = [];
+                const getAccentColor = () => getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
+                const resizeCanvas = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+                
+                class Particle {
+                    constructor() {
+                        this.x = Math.random() * canvas.width;
+                        this.y = Math.random() * canvas.height;
+                        this.vx = (Math.random() - 0.5) * 0.4; 
+                        this.vy = (Math.random() - 0.5) * 0.4;
+                        this.size = Math.random() * 2.5 + 0.5; 
+                    }
+                    update() {
+                        this.x += this.vx;
+                        this.y += this.vy;
+                        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                    }
+                    draw(accent) {
+                        // opacidade reduzida
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'; 
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+                const init = () => {
+                    particles = [];
+                    const numberOfParticles = window.innerWidth < 768 ? 40 : 85; 
+                    for (let i = 0; i < numberOfParticles; i++) particles.push(new Particle());
+                };
+                const animate = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const accent = getAccentColor();
+                    
+                    for (let i = 0; i < particles.length; i++) {
+                        particles[i].update();
+                        particles[i].draw(accent);
+                        for (let j = i; j < particles.length; j++) {
+                            const dx = particles[i].x - particles[j].x;
+                            const dy = particles[i].y - particles[j].y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            if (distance < 160) { 
+                                ctx.beginPath();
+                                ctx.strokeStyle = accent + Math.floor((1 - distance/160) * 80).toString(16).padStart(2, '0'); 
+                                ctx.lineWidth = 0.6; 
+                                ctx.moveTo(particles[i].x, particles[i].y);
+                                ctx.lineTo(particles[j].x, particles[j].y);
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                    animationFrameId = requestAnimationFrame(animate);
+                };
+                window.addEventListener('resize', () => { resizeCanvas(); init(); });
+                resizeCanvas();
+                init();
+                animate();
+                return () => { window.removeEventListener('resize', resizeCanvas); cancelAnimationFrame(animationFrameId); };
+            }, []);
+            return <canvas ref={canvasRef} className="absolute inset-0 z-0 pointer-events-none mix-blend-screen" />;
+        };
+
+        // 2. efeito plexus footer
+        const CyberPlexus = () => {
+            const canvasRef = useRef(null);
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext('2d');
+                let animationFrameId;
+                let nodes = [];
+                const mouse = { x: null, y: null, radius: 200 };
+                const resizeCanvas = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+                window.addEventListener('mousemove', (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    mouse.x = e.clientX - rect.left;
+                    mouse.y = e.clientY - rect.top;
+                });
+                class Node {
+                    constructor() {
+                        this.x = Math.random() * canvas.width;
+                        this.y = Math.random() * canvas.height;
+                        this.size = Math.random() * 2 + 1;
+                        this.speedX = (Math.random() - 0.5) * 1.5;
+                        this.speedY = (Math.random() - 0.5) * 1.5;
+                    }
+                    update() {
+                        this.x += this.speedX;
+                        this.y += this.speedY;
+                        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+                        let dx = mouse.x - this.x;
+                        let dy = mouse.y - this.y;
+                        let distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance < mouse.radius) {
+                             if(mouse.x < this.x && this.x < canvas.width - this.size * 10) this.x += 2;
+                             if(mouse.x > this.x && this.x > this.size * 10) this.x -= 2;
+                             if(mouse.y < this.y && this.y < canvas.height - this.size * 10) this.y += 2;
+                             if(mouse.y > this.y && this.y > this.size * 10) this.y -= 2;
+                        }
+                    }
+                    draw(accent) {
+                        ctx.fillStyle = accent; 
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+                const init = () => {
+                    nodes = [];
+                    const count = window.innerWidth < 768 ? 40 : 80;
+                    for (let i = 0; i < count; i++) nodes.push(new Node());
+                };
+                const animate = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
+                    for (let i = 0; i < nodes.length; i++) {
+                        nodes[i].update();
+                        nodes[i].draw(accent);
+                        for (let j = i; j < nodes.length; j++) {
+                            const dx = nodes[i].x - nodes[j].x;
+                            const dy = nodes[i].y - nodes[j].y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            if (distance < 100) {
+                                ctx.beginPath();
+                                ctx.strokeStyle = accent + '30'; 
+                                ctx.lineWidth = 0.5;
+                                ctx.moveTo(nodes[i].x, nodes[i].y);
+                                ctx.lineTo(nodes[j].x, nodes[j].y);
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                    animationFrameId = requestAnimationFrame(animate);
+                };
+                resizeCanvas(); init(); animate();
+                window.addEventListener('resize', () => { resizeCanvas(); init(); });
+                return () => { cancelAnimationFrame(animationFrameId); };
+            }, []);
+            return <canvas ref={canvasRef} className="absolute inset-0 z-0 opacity-20 pointer-events-none" />;
+        };
+
+        // maquina de escrever
+        const TypewriterHero = () => {
+            const words = ["PERFORMANCE", "WEBSITES", "LANDING PAGES", "SEO AVANÇADO", "UX DESIGNER"];
+            const [text, setText] = useState('');
+            const [isDeleting, setIsDeleting] = useState(false);
+            const [loopNum, setLoopNum] = useState(0);
+            const [typingSpeed, setTypingSpeed] = useState(80);
+
+            useEffect(() => {
+                const handleType = () => {
+                    const i = loopNum % words.length;
+                    const fullText = words[i];
+
+                    setText(isDeleting 
+                        ? fullText.substring(0, text.length - 1) 
+                        : fullText.substring(0, text.length + 1)
+                    );
+
+                    setTypingSpeed(isDeleting ? 30 : 80);
+
+                    if (!isDeleting && text === fullText) {
+                        setTimeout(() => setIsDeleting(true), 2000);
+                    } else if (isDeleting && text === '') {
+                        setIsDeleting(false);
+                        setLoopNum(loopNum + 1);
+                    }
+                };
+
+                const timer = setTimeout(handleType, typingSpeed);
+                return () => clearTimeout(timer);
+            }, [text, isDeleting, loopNum, typingSpeed, words]);
+
+            return (
+                <div className="h-24 md:h-32 flex items-center justify-center overflow-hidden w-full">
+                    <h1 className="text-4xl sm:text-5xl md:text-8xl font-black tracking-tighter uppercase text-white flex items-center">
+                        {text}
+                        <span className="w-1 md:w-3 h-10 md:h-20 bg-accent ml-1 md:ml-2 animate-blink inline-block"></span>
+                    </h1>
+                </div>
+            );
+        };
+
+        // temas
+        const ThemeSwitcher = () => {
+            const themes = [
+                { name: 'Roxo Royal', color: '#a855f7', glow: 'rgba(168, 85, 247, 0.8)', bg: '#0b0214' },
+                { name: 'Cyber Lime', color: '#84cc16', glow: 'rgba(132, 204, 22, 0.8)', bg: '#0a1402' },
+                { name: 'Electric Blue', color: '#0ea5e9', glow: 'rgba(14, 165, 233, 0.8)', bg: '#02101a' },
+                { name: 'Magma Red', color: '#f43f5e', glow: 'rgba(244, 63, 94, 0.8)', bg: '#1c0307' }
+            ];
+            const [activeTheme, setActiveTheme] = useState(0);
+            const [isOpen, setIsOpen] = useState(false);
+            useEffect(() => {
+                const root = document.documentElement;
+                root.style.setProperty('--accent-color', themes[activeTheme].color);
+                root.style.setProperty('--accent-glow', themes[activeTheme].glow);
+                root.style.setProperty('--bg-color', themes[activeTheme].bg);
+            }, [activeTheme]);
+            return (
+                <div className="relative">
+                     <button onClick={() => setIsOpen(!isOpen)} className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center text-white hover:text-accent hover:border-accent transition-all hover:rotate-90 bg-white/5 backdrop-blur-sm">
+                        <Palette size={18} />
+                    </button>
+                    <AnimatePresence>
+                        {isOpen && (
+                            <motion.div initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }} className="absolute top-12 right-0 bg-zinc-900/90 border border-white/10 p-2 rounded-xl flex flex-col gap-1 w-40 backdrop-blur-md z-50 shadow-2xl">
+                                {themes.map((t, i) => (
+                                    <button key={i} onClick={() => { setActiveTheme(i); setIsOpen(false); }} className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 text-xs font-bold uppercase transition-colors text-left">
+                                        <div className="w-3 h-3 rounded-full shadow-[0_0_8px]" style={{ backgroundColor: t.color, boxShadow: `0 0 8px ${t.color}` }} />
+                                        {t.name}
+                                    </button>
+                                ))}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            );
+        };
+
+        // whatsapp fixo
+        const FixedWhatsApp = () => {
+            const [isHovered, setHovered] = useState(false);
+            const message = "Ol%C3%A1%20Giovanna!%20Vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20conversar%20sobre%20um%20projeto.";
+
+            return (
+                <motion.a 
+                    href={`https://wa.me/5511948562304?text=${message}`}
+                    target="_blank"
+                    onHoverStart={() => setHovered(true)}
+                    onHoverEnd={() => setHovered(false)}
+                    className="fixed bottom-8 right-8 z-50 flex items-center text-white rounded-full shadow-[0_0_20px_rgba(255,255,255,0.2)] border-2 border-white/10 hover:shadow-[0_0_30px_var(--accent-glow)] transition-all overflow-hidden"
+                    style={{ backgroundColor: 'var(--accent-color)' }}
+                    initial={{ width: '4rem', height: '4rem' }}
+                    animate={{ width: isHovered ? 'auto' : '4rem' }}
+                >
+                    <div className="w-16 h-16 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor" className="text-white">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                        </svg>
+                    </div>
+                    
+                    <AnimatePresence>
+                        {isHovered && (
+                            <motion.span 
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -10 }}
+                                className="whitespace-nowrap font-bold pr-6 text-lg"
+                            >
+                                Vamos Conversar?
+                            </motion.span>
+                        )}
+                    </AnimatePresence>
+                </motion.a>
+            );
+        };
+
+        // --- seções ---
+
+        const BioSection = () => {
+            const containerRef = useRef(null);
+            const mouseX = useMotionValue(0);
+            const mouseY = useMotionValue(0);
+
+            const handleMouseMove = ({ clientX, clientY }) => {
+                if(!containerRef.current) return;
+                const { left, top } = containerRef.current.getBoundingClientRect();
+                mouseX.set(clientX - left);
+                mouseY.set(clientY - top);
+            };
+
+            return (
+                <section id="bio" className="py-24 px-4 md:px-20 relative overflow-hidden flex items-center justify-center">
+                     <div 
+                        ref={containerRef}
+                        onMouseMove={handleMouseMove}
+                        className="max-w-6xl w-full relative group rounded-3xl border border-white/10 bg-white/5 p-8 md:p-20 overflow-hidden"
+                     >
+                        <motion.div
+                            className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 transition duration-300 group-hover:opacity-100"
+                            style={{
+                                background: useMotionTemplate`radial-gradient(650px circle at ${mouseX}px ${mouseY}px, rgba(255, 255, 255, 0.1), transparent 80%)`,
+                            }}
+                        />
+                        <div className="relative z-10 flex flex-col md:flex-row gap-8 md:gap-12 items-center">
+                            <div className="w-32 h-32 md:w-48 md:h-48 rounded-full overflow-hidden border border-white/20 shrink-0 shadow-[0_0_50px_var(--accent-glow)]">
+                                <img src="https://i.ibb.co/BVmgpCF2/gm.jpg" alt="Giovanna Mayumi" className="w-full h-full object-cover" />
+                            </div>
+                            <div className="flex-1 text-center md:text-left">
+                                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+                                    <h2 className="text-3xl md:text-5xl font-bold mb-6">Olá, sou <span className="text-accent">Giovanna Mayumi</span>.</h2>
+                                    <p className="text-base md:text-xl text-gray-300 leading-relaxed mb-6">Uma desenvolvedora Front-End apaixonada por transformar ideias em realidade digital. Minha especialidade é criar <strong className="text-white">Landing Pages e Websites de alta conversão</strong>, onde cada linha de código e cada elemento de design trabalham juntos para um único objetivo: <span className="text-accent font-bold">gerar resultados para o seu negócio</span>.</p>
+                                    <p className="text-base md:text-xl text-gray-300 leading-relaxed">Todos os meus projetos são construídos sobre três pilares: <strong className="text-white border-b border-accent/50">performance impecável</strong>, <strong className="text-white border-b border-accent/50">experiência de usuário intuitiva</strong> e <strong className="text-white border-b border-accent/50">SEO estratégico</strong>, garantindo que seu site não apenas pareça incrível, mas que também seja encontrado e amado pelo seu público-alvo.</p>
+                                </motion.div>
+                            </div>
+                        </div>
+                     </div>
+                </section>
+            );
+        };
+
+        const WorkflowSection = () => {
+            const steps = [
+                { id: 1, title: "Discovery", desc: "Mergulho no seu negócio para entender objetivos, público e concorrentes.", icon: <Search /> },
+                { id: 2, title: "UI/UX Design", desc: "Prototipagem de alta fidelidade focada em conversão e identidade visual.", icon: <Layers /> },
+                { id: 3, title: "Development", desc: "Código limpo, estruturado e otimização extrema de performance.", icon: <Monitor /> },
+                { id: 4, title: "Launch & SEO", desc: "Publicação, indexação no Google e entrega de painel administrativo.", icon: <Rocket /> },
+            ];
+
+            return (
+                <section className="py-20 px-4 relative border-t border-white/5 bg-black/20">
+                    <div className="max-w-7xl mx-auto">
+                        <motion.div 
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="text-center mb-16"
+                        >
+                            <h2 className="text-3xl md:text-4xl font-bold mb-4">Como eu trabalho<span className="text-accent">.</span></h2>
+                            <p className="text-gray-400">Do briefing ao deploy em 4 passos estratégicos.</p>
+                        </motion.div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+                            {steps.map((step, i) => (
+                                <motion.div 
+                                    key={step.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: i * 0.1 }}
+                                    className="relative p-6 md:p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-accent/50 transition-colors group"
+                                >
+                                    <div className="absolute -top-4 -left-4 w-10 h-10 bg-accent rounded-full flex items-center justify-center font-bold text-white shadow-lg z-10">
+                                        {step.id}
+                                    </div>
+                                    <div className="mb-6 text-accent p-3 bg-accent/10 rounded-lg inline-block group-hover:scale-110 transition-transform">
+                                        {step.icon}
+                                    </div>
+                                    <h3 className="text-lg md:text-xl font-bold mb-3">{step.title}</h3>
+                                    <p className="text-gray-400 text-sm leading-relaxed">{step.desc}</p>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const InteractiveShowcase = () => {
+            const [activeTab, setActiveTab] = useState(0);
+            const tabs = [
+                { id: 0, label: "Landing Pages de Alta Conversão", icon: <Rocket size={20} />, title: "Venda Mais", desc: "Páginas focadas em um único objetivo: converter visitantes em clientes. Design persuasivo, gatilhos mentais e carregamento ultrarrápido para maximizar seu ROI.", bg: "bg-purple-900/20" },
+                { id: 1, label: "Websites Institucionais", icon: <Monitor size={20} />, title: "Autoridade Digital", desc: "Sua vitrine online. Sites modernos, responsivos e gerenciáveis que transmitem profissionalismo e fortalecem a presença da sua marca no mercado.", bg: "bg-blue-900/20" },
+                { id: 2, label: "Otimização & Performance", icon: <Zap size={20} />, title: "SEO & Velocidade", desc: "Ninguém gosta de site lento. Otimizo seu site para atingir pontuações máximas no Google PageSpeed, melhorando o ranqueamento orgânico (SEO).", bg: "bg-green-900/20" }
+            ];
+
+            return (
+                <section className="py-20 px-4 md:px-20 max-w-7xl mx-auto">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                        <div className="lg:col-span-4 flex flex-col justify-center space-y-4">
+                            <h2 className="text-3xl md:text-4xl font-bold mb-8">Soluções<span className="text-accent">.</span></h2>
+                            {tabs.map((tab, idx) => (
+                                <button key={idx} onClick={() => setActiveTab(idx)} className={`text-left p-4 md:p-6 rounded-xl border transition-all duration-300 flex items-center gap-4 group ${activeTab === idx ? "bg-accent/10 border-accent text-white" : "bg-transparent border-white/5 text-gray-500 hover:border-white/20 hover:text-white"}`}>
+                                    <div className={`p-2 rounded-lg transition-colors shrink-0 ${activeTab === idx ? "bg-accent text-white" : "bg-white/5 group-hover:bg-white/10"}`}>{tab.icon}</div>
+                                    <span className="font-semibold text-base md:text-lg">{tab.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                        <div className="lg:col-span-8 relative min-h-[400px]">
+                            <AnimatePresence mode="wait">
+                                <motion.div key={activeTab} initial={{ opacity: 0, x: 20, scale: 0.95 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: -20, scale: 0.95 }} transition={{ duration: 0.4 }} className={`w-full h-full rounded-3xl border border-white/10 p-8 md:p-10 flex flex-col justify-center relative overflow-hidden ${tabs[activeTab].bg}`}>
+                                    <div className="absolute top-0 right-0 w-64 h-64 bg-accent opacity-20 blur-[100px] rounded-full translate-x-1/2 -translate-y-1/2" />
+                                    <div className="relative z-10">
+                                        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
+                                            <span className="px-4 py-2 rounded-full border border-accent/30 bg-accent/10 text-accent text-xs font-bold uppercase tracking-wider mb-6 inline-block">Serviço #{activeTab + 1}</span>
+                                            <h3 className="text-3xl md:text-6xl font-bold mb-6 leading-tight">{tabs[activeTab].title}</h3>
+                                            <p className="text-lg md:text-xl text-gray-300 leading-relaxed max-w-2xl">{tabs[activeTab].desc}</p>
+                                        </motion.div>
+                                    </div>
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const ProjectCard = ({ title, category, description, image, link }) => {
+            return (
+                <motion.a 
+                    href={link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ y: -10 }} 
+                    className="group relative h-[400px] w-full rounded-2xl bg-white/5 border border-white/10 overflow-hidden cursor-pointer block"
+                >
+                    {/* imagem de fundo */}
+                    <div className="absolute inset-0 z-0">
+                        <img src={image} alt={title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-60 group-hover:opacity-40" />
+                    </div>
+                    
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent z-10" />
+                    
+                    <div className="relative z-20 flex flex-col justify-between h-full p-8">
+                         <div className="flex justify-between items-start">
+                            <div className="p-3 bg-black/50 backdrop-blur-md rounded-full border border-white/10"><Monitor size={20} className="text-accent" /></div>
+                            <ExternalLink size={20} className="text-white drop-shadow-md group-hover:text-accent transition-colors" />
+                        </div>
+                        
+                        <div>
+                            <span className="text-xs font-mono text-accent tracking-widest uppercase mb-2 block">{category}</span>
+                            <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-accent transition-colors">{title}</h3>
+                            <p className="text-gray-300 text-sm mb-6 line-clamp-3 leading-relaxed">{description}</p>
+                            <span className="text-xs font-bold uppercase tracking-wider flex items-center gap-2 group-hover:gap-4 transition-all text-white">Ver Projeto <ArrowRight size={14} className="text-accent" /></span>
+                        </div>
+                    </div>
+                </motion.a>
+            );
+        };
+
+        const FAQ = () => {
+            const items = [
+                { q: "Qual o prazo de entrega de uma Landing Page?", a: "Em média, uma Landing Page de alta performance é entregue em 5 a 10 dias úteis após o recebimento de todo o material (textos e imagens)." },
+                { q: "Como funciona o orçamento e pagamento?", a: "O orçamento é personalizado conforme a necessidade do projeto. Geralmente trabalho com 50% de entrada e 50% na entrega, aceitando Pix ou Cartão de Crédito." },
+                { q: "O site será otimizado para o Google (SEO)?", a: "Com certeza! Todos os projetos já nascem com a estrutura de SEO técnico pronta: tags corretas, carregamento rápido e sitemap, facilitando ser encontrado no Google." },
+                { q: "Preciso ter o design pronto?", a: "Não necessariamente. Posso criar o layout do zero com base na sua identidade visual, ou seguir um design que você já tenha." }
+            ];
+            return (
+                <div className="max-w-4xl mx-auto py-32 px-6">
+                    <div className="text-center mb-16">
+                        <div className="inline-block p-3 bg-white/5 rounded-full mb-4"><HelpCircle className="w-8 h-8 text-accent" /></div>
+                        <h3 className="text-4xl font-bold">Perguntas Frequentes</h3>
+                        <p className="text-gray-400 mt-2">Tudo o que você precisa saber antes de começarmos.</p>
+                    </div>
+                    <div className="grid gap-4">
+                        {items.map((item, i) => <FAQItem key={i} q={item.q} a={item.a} />)}
+                    </div>
+                </div>
+            );
+        };
+
+        const FAQItem = ({ q, a }) => {
+            const [isOpen, setIsOpen] = useState(false);
+            return (
+                <div className="border border-white/10 rounded-lg bg-white/5 overflow-hidden transition-all hover:bg-white/10">
+                    <button onClick={() => setIsOpen(!isOpen)} className="w-full flex justify-between items-center p-6 text-left">
+                        <span className="font-semibold text-base md:text-lg pr-4">{q}</span>
+                        {isOpen ? <Minus size={20} className="text-accent shrink-0"/> : <Plus size={20} className="shrink-0" />}
+                    </button>
+                    <AnimatePresence>
+                        {isOpen && (
+                            <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden">
+                                <p className="p-6 pt-0 text-gray-400 leading-relaxed text-sm md:text-base">{a}</p>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            );
+        };
+
+        const Testimonials = () => {
+            const clients = [
+                { name: "Ana Souza", role: "CEO Startup", text: "A Giovanna captou exatamente a essência da nossa marca. O site ficou lindo e os clientes elogiam muito a facilidade de agendamento." },
+                { name: "Carlos Ferreira", role: "Marketing Director", text: "Super atenciosa e entregou antes do prazo. O site carrega muito rápido no celular, exatamente o que eu precisava." },
+                { name: "Beatriz Lima", role: "E-commerce Founder", text: "Adorei o resultado! Ela me explicou tudo sobre como atualizar o site depois. Recomendo demais." }
+            ];
+
+            return (
+                <section className="py-20 px-4 relative overflow-hidden">
+                    <div className="max-w-7xl mx-auto">
+                         <motion.h2 initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className="text-3xl md:text-4xl font-bold text-center mb-16">
+                            O que dizem sobre mim<span className="text-accent">.</span>
+                        </motion.h2>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {clients.map((client, i) => (
+                                <motion.div 
+                                    key={i}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: i * 0.2 }}
+                                    className="p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm relative"
+                                >
+                                    <div className="text-accent mb-4"><CheckCircle /></div>
+                                    <p className="text-gray-300 italic mb-6">"{client.text}"</p>
+                                    <div>
+                                        <p className="font-bold text-white">{client.name}</p>
+                                        <p className="text-xs text-gray-500 uppercase tracking-widest">{client.role}</p>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        function App() {
+            const { scrollYProgress } = useScroll();
+            const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+            const whatsappMessage = "Ol%C3%A1%20Giovanna!%20Vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20conversar%20sobre%20um%20projeto.";
+
+            return (
+                <div className="font-sans min-h-screen relative selection:bg-accent selection:text-white aurora-bg animation-aurora">
+                    <FixedWhatsApp />
+                    <motion.div className="fixed top-0 left-0 right-0 h-1 bg-accent origin-left z-50" style={{ scaleX }} />
+
+                    <nav className="fixed top-0 w-full p-6 px-4 md:px-10 flex justify-between items-center z-40 bg-black/50 backdrop-blur-md border-b border-white/5">
+                        <span className="text-xl font-bold tracking-tighter hover:text-accent cursor-pointer transition-colors duration-300">MAYUMI<span className="text-accent">.</span>DEV</span>
+                        <div className="hidden md:flex gap-8 text-sm font-medium tracking-wide">
+                            <a href="#work" className="opacity-70 hover:opacity-100 hover:text-accent transition-all">PROJETOS</a>
+                            <a href="#bio" className="opacity-70 hover:opacity-100 hover:text-accent transition-all">SOBRE</a>
+                            <a href="#faq" className="opacity-70 hover:opacity-100 hover:text-accent transition-all">FAQ</a>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <ThemeSwitcher />
+                            <a href={`https://wa.me/5511948562304?text=${whatsappMessage}`} className="hidden md:block px-5 py-2 border border-white/20 rounded-full text-xs font-bold uppercase hover:bg-white hover:text-black transition-all">Contato</a>
+                        </div>
+                    </nav>
+
+                    <section className="relative h-screen flex flex-col items-center justify-center px-4 overflow-hidden">
+                        <PlexusBackground />
+                        <div className="z-10 text-center max-w-5xl mx-auto w-full px-2">
+                            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1 }} className="mb-8 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-accent/30 bg-accent/10 backdrop-blur-md shadow-[0_0_15px_var(--accent-glow)]">
+                                <span className="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
+                                <span className="text-xs font-mono text-accent tracking-wider">DISPONÍVEL PARA PROJETOS</span>
+                            </motion.div>
+                            
+                            {/* typewriter hero */}
+                            <TypewriterHero />
+                            
+                            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6, duration: 1 }} className="text-lg md:text-2xl text-gray-300 max-w-2xl mx-auto mt-8 mb-12 font-light leading-relaxed drop-shadow-md">Transformando visitantes em clientes com Design Estratégico e Tecnologia de Ponta.</motion.p>
+                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }} className="flex flex-col md:flex-row gap-4 justify-center items-center w-full">
+                                <a href={`https://wa.me/5511948562304?text=${whatsappMessage}`} target="_blank" className="w-full md:w-auto px-10 py-4 bg-white text-black font-bold rounded-full hover:scale-105 transition-transform flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(255,255,255,0.3)] hover:shadow-[0_0_40px_var(--accent-glow)]">Solicitar Orçamento</a>
+                                <a href="#work" className="w-full md:w-auto px-10 py-4 bg-transparent border border-white/20 text-white font-bold rounded-full hover:bg-white/10 transition-colors flex items-center justify-center gap-2">Ver Portfolio <ArrowRight size={20} /></a>
+                            </motion.div>
+                        </div>
+                        
+                        {/* seta de scroll */}
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1, y: [0, 10, 0] }}
+                            transition={{ delay: 1.5, duration: 2, repeat: Infinity }}
+                            className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 cursor-pointer"
+                            onClick={() => document.getElementById('about').scrollIntoView({behavior: 'smooth'})}
+                        >
+                            <ChevronDown className="text-accent w-10 h-10" />
+                        </motion.div>
+                    </section>
+
+                    <section className="py-16 border-y border-white/5 relative z-10 overflow-hidden bg-black/30 backdrop-blur-sm">
+                         <div className="overflow-hidden m-0 whitespace-nowrap flex flex-nowrap select-none">
+                            <motion.div className="font-bold uppercase text-6xl md:text-9xl text-transparent stroke-text opacity-10 flex whitespace-nowrap" animate={{ x: [0, -1000] }} transition={{ repeat: Infinity, duration: 20, ease: "linear" }}>
+                                <span className="block mr-10">WEB DESIGN • PERFORMANCE • </span>
+                                <span className="block mr-10">WEB DESIGN • PERFORMANCE • </span>
+                            </motion.div>
+                        </div>
+                    </section>
+
+                    {/* Solucoes */}
+                    <div id="about" className="relative"><InteractiveShowcase /></div>
+
+                    {/* Processo */}
+                    <WorkflowSection />
+                    
+                    {/* Projetos */}
+                    <section id="work" className="py-32 px-6 md:px-20 relative overflow-hidden">
+                        <div className="absolute right-0 bottom-0 w-[500px] h-[500px] bg-accent opacity-10 rounded-full blur-[150px] pointer-events-none" />
+                        <div className="max-w-7xl mx-auto relative z-10">
+                            <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 gap-6">
+                                <motion.h2 initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="text-4xl md:text-8xl font-bold text-white">Projetos<br/>Selecionados<span className="text-accent">.</span></motion.h2>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                                <ProjectCard 
+                                    title="LM Estética Automotiva" 
+                                    category="Website / Estética" 
+                                    description="Site focado em serviços de estética automotiva, com galeria, vídeos de antes/depois e agendamento fácil."
+                                    link="https://www.lmesteticautomotiva.com.br/"
+                                    image="lm2.png" 
+                                />
+                                <ProjectCard 
+                                    title="Cíntia Gomes Psicóloga" 
+                                    category="Site Institucional / Saúde" 
+                                    description="Página profissional para psicologia clínica. Design calmo e acolhedor, transmitindo confiança e facilidade de contato para pacientes." 
+                                    link="https://cintiagomespsicologa.com.br/"
+                                    image="cinprin1.png" 
+                                />
+                                <ProjectCard 
+                                    title="Portela APS" 
+                                    category="Venda de Infoprodutos / Hotmart" 
+                                    description="Site estratégico para venda de modelos de artigos e petições jurídicas. Integração direta com Hotmart e foco total em conversão de infoprodutos." 
+                                    link="https://portelaaps.com.br/"
+                                    image="portprin1.png" 
+                                />
+                                <ProjectCard 
+                                    title="FS Transporte e Mudanças" 
+                                    category="Landing Page / Logística" 
+                                    description="Página de alta conversão para serviços de logística e mudanças. Foco total em orçamentos rápidos via WhatsApp." 
+                                    link="https://fstransporteemudancas.com.br/"
+                                    image="fspr1.png" 
+                                />
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Bio */}
+                    <BioSection />
+                    
+                    {/* Feedbacks */}
+                    <Testimonials />
+                    
+                    {/* FAQ */}
+                    <section id="faq" className="border-t border-white/5 relative bg-black/20"><FAQ /></section>
+
+                    <section id="contact" className="relative overflow-hidden bg-black">
+                        <CyberPlexus />
+                        <div className="absolute inset-0 w-full h-full bg-[radial-gradient(circle_at_bottom,_var(--accent-glow),_transparent_70%)] opacity-10 pointer-events-none"></div>
+
+                        <div className="max-w-7xl mx-auto px-6 relative z-10">
+                            <div className="py-32 text-center">
+                                 <motion.h2 
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    className="text-5xl md:text-8xl font-bold mb-16 md:mb-20 tracking-tight text-white"
+                                 >
+                                    Vamos criar algo <br/>
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">extraordinário?</span>
+                                 </motion.h2>
+                                 <motion.div 
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
+                                    className="flex justify-center mt-12 md:mt-16"
+                                 >
+                                    <a href={`https://wa.me/5511948562304?text=${whatsappMessage}`} target="_blank" className="group relative px-10 py-5 bg-white text-black font-bold text-xl rounded-full hover:scale-105 transition-all flex items-center gap-3 shadow-[0_0_40px_var(--accent-glow)]">
+                                        <span>Iniciar Projeto</span>
+                                        <div className="w-8 h-8 bg-black rounded-full text-white flex items-center justify-center group-hover:rotate-45 transition-transform">
+                                            <ArrowRight size={16} />
+                                        </div>
+                                    </a>
+                                 </motion.div>
+                            </div>
+
+                            <div className="border-t border-white/10 pt-16 pb-8">
+                                <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+                                    <div className="md:col-span-1 space-y-4">
+                                        <span className="text-2xl font-bold tracking-tighter">MAYUMI<span className="text-accent">.</span>DEV</span>
+                                        <p className="text-gray-400 text-sm leading-relaxed">
+                                            Desenvolvimento web estratégico focado em resultados reais. Design, código e performance em sintonia.
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <h4 className="font-bold mb-6 text-white">Navegação</h4>
+                                        <ul className="space-y-3 text-sm text-gray-400">
+                                            <li><a href="#work" className="hover:text-accent transition-colors">Projetos</a></li>
+                                            <li><a href="#bio" className="hover:text-accent transition-colors">Sobre Mim</a></li>
+                                            <li><a href="#faq" className="hover:text-accent transition-colors">Perguntas Frequentes</a></li>
+                                        </ul>
+                                    </div>
+
+                                    <div>
+                                        <h4 className="font-bold mb-6 text-white">Expertise</h4>
+                                        <ul className="space-y-3 text-sm text-gray-400">
+                                            <li>Landing Pages</li>
+                                            <li>Websites Institucionais</li>
+                                            <li>Otimização de Performance</li>
+                                            <li>SEO Técnico</li>
+                                        </ul>
+                                    </div>
+
+                                    <div>
+                                        <h4 className="font-bold mb-6 text-white">Status</h4>
+                                        <div className="flex items-center gap-2 text-sm text-gray-400 mb-4">
+                                            <span className="relative flex h-3 w-3">
+                                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                              <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                                            </span>
+                                            Disponível para novos projetos
+                                        </div>
+                                        <p className="text-gray-500 text-xs">
+                                            São Paulo, Brasil <br/>
+                                            Atendimento Global (Remoto)
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-white/5 text-xs text-gray-600">
+                                    <p>© {new Date().getFullYear()} Mayumi Dev. Todos os direitos reservados.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            );
+        }
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
